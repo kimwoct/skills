@@ -4,9 +4,10 @@ Essential agent skills collection: engineering workflow, UI, research, and writi
 skills for AI coding agents (Claude Code, Codex, ZCode, …).
 
 Each skill is a self-contained folder (`skills/<name>/SKILL.md` plus any supporting
-files) that you drop into your agent's skills directory. Companion loop skills
-[`ui-fix-loop`](https://github.com/kimwoct/ui-fix-loop) and
-[`ui-verify-loop`](https://github.com/kimwoct/ui-verify-loop) live in their own repos.
+files) that you drop into your agent's skills directory. The companion loop skills
+`ui-fix-loop` and `ui-verify-loop` are included here and also maintained in their own
+repos ([ui-fix-loop](https://github.com/kimwoct/ui-fix-loop),
+[ui-verify-loop](https://github.com/kimwoct/ui-verify-loop)).
 
 ## Included skills
 
@@ -25,6 +26,8 @@ files) that you drop into your agent's skills directory. Companion loop skills
 | `resolving-merge-conflicts` | Resolve an in-progress git merge/rebase conflict |
 | `tdd` | Test-driven development — red-green-refactor and integration testing |
 | `triage` | Move issues and external PRs through a state machine of triage roles |
+| `ui-fix-loop` | Loop-engineering workflow for UI bug fixes: REVIEW → PREVIEW (approval gate) → IMPLEMENT → VERIFY on one HTML canvas |
+| `ui-verify-loop` | Closing gate after a UI fix: proves the change matches a named REFERENCE and is deployed + e2e-verified |
 | `vercel-react-best-practices` | React and Next.js performance optimization guidelines from Vercel Engineering |
 | `writing-great-skills` | Reference for writing and editing skills well |
 
