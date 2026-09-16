@@ -1,6 +1,6 @@
 ---
 name: ui-verify-loop
-description: Closing gate for UI-visible fixes and changes. Runs AFTER a fix is implemented (typically via ui-fix-loop) and proves it against a user-named REFERENCE: ask which reference to cross-check and get approval BEFORE fixing, then live-verify, then DEPLOY to the target environment and run an end-to-end confirmation against the same reference — with evidence on the review canvas — before a round may be called FIXED.
+description: "Closing gate for UI-visible fixes and changes. Runs AFTER a fix is implemented (typically via ui-fix-loop) and proves it against a user-named REFERENCE: ask which reference to cross-check and get approval BEFORE fixing, then live-verify, then DEPLOY to the target environment and run an end-to-end confirmation against the same reference — with evidence on the review canvas — before a round may be called FIXED."
 ---
 
 # UI Verify Loop
