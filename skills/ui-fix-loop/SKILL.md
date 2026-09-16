@@ -15,6 +15,7 @@ A standing workflow for UI bug fixes, usable in any project. One HTML canvas acc
 - ONE file per issue, updated in place through the phases. Never fork it into per-phase copies.
 - Plain hand-written HTML/CSS replicating the relevant UI region — no framework, no build step.
 - Every canvas includes the approval widget: add `<script src="/canvas-approval.js"></script>` before `</body>`. It renders a floating panel with a **required answer box per open question**, a comment input, and Approve / Request-changes buttons that POST to the server's decision API.
+- **The heading carries the board task no.** When the work has a Conductor card — a canvas dispatch, or any request that can be tied to a card — begin both `<h1>` and `<title>` with `[t-<id8>]` (`<h1>[t-3ecb9f12] 電郵發送追蹤表 …`), taken from the card's `display_id`. The raw `:8791` URL has no board chrome, so the heading is the only place the id can appear. When no card id is knowable, leave the heading clean rather than guessing — a wrong prefix is worse than none.
 
 ## Serving the canvas (server.py + Tailscale)
 
