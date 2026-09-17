@@ -14,8 +14,8 @@ A standing workflow for UI bug fixes, usable in any project. One HTML canvas acc
 - Path: `~/.agents/ui-fix-canvas/<repo>/<issue-slug>.html` — outside every repo, so scratch files are never committed and no per-project setup is needed. The `<repo>` segment must be a lowercase-hyphen slug (`ai-leave-management-frontend`, never the GitHub-cased name) and, when the canvas should dispatch work, a key in the dispatch-watcher's `REPOS` map; root-level pages (`/<slug>.html`) are rejected too. A non-conforming segment makes every Approve POST 404 "unknown canvas" with no other symptom.
 - ONE file per issue, updated in place through the phases. Never fork it into per-phase copies.
 - Plain hand-written HTML/CSS replicating the relevant UI region — no framework, no build step.
-- Every canvas includes the approval widget: add `<script src="/canvas-approval.js"></script>` before `</body>`. It renders a floating panel with a **required answer box per open question**, a comment input, and Approve / Request-changes buttons that POST to the server's decision API.
-- **The heading carries the board task no.** When the work has a Conductor card — a canvas dispatch, or any request that can be tied to a card — begin both `<h1>` and `<title>` with `[t-<id8>]` (`<h1>[t-3ecb9f12] 電郵發送追蹤表 …`), taken from the card's `display_id`. The raw `:8791` URL has no board chrome, so the heading is the only place the id can appear. When no card id is knowable, leave the heading clean rather than guessing — a wrong prefix is worse than none.
+- Every canvas includes the approval widget: add `<script src="/canvas-approval.js"></script>` before `</body>`. It renders a floating panel with a **required answer box per open question**, a comment input, and Approve / Request-changes buttons that POST to the server's decision API. The gate keys off the questions declared as `approval-answer` fields (Phase 2) — a canvas with the script but no such fields has a widget with nothing to gate.
+- **The heading carries the board task no.** When the work has a Conductor card — a canvas dispatch, or any request that can be tied to a card — begin both `<h1>` and `<title>` with `[t-<id8>]` (e.g. `<h1>[t-3ecb9f12] 前後測活動報告 …</h1>`), taken from the card's `display_id`. The raw `:8791` URL has no board chrome, so the heading is the only place the id can appear. When no card id is knowable, leave the heading clean rather than guessing — a wrong prefix is worse than none.
 - **Traceability is two-way and is part of the deliverable:**
   - canvas → card: the `[t-<id8>]` heading above. A canvas opened from its bare tailnet URL is anonymous without it.
   - card → canvas: the card's `canvas` field must be `<repo>/<slug>` — that field is what the board card modal, the Inbox rows, and the `/requirement-canvas/<cardId>` board route render as the review link. Canvas dispatches write it at intake; for any other origin (interactive rounds, card created before/without the canvas), set it at canvas-creation time, not when the user goes looking for it. Setting it needs conductor tooling — `conductor.kanban_update` from a session that has it, or the dashboard card edit — so a session without conductor access must ask the conductor session to write the link rather than skip it.
@@ -37,6 +37,8 @@ Before reading implementation code in depth, build the canvas in its REVIEW stat
 - A mock of the **broken** UI region as it currently renders (replicate the defect faithfully — e.g. the duplicated rail rows).
 - A numbered **issue list**: one line per defect, each with a concrete expected behavior.
 - Numbered **highlight markers** on the mock, one per issue, so list ↔ region mapping is visible at a glance.
+
+**Done when:** every defect the review found is a numbered issue with a matching marker on the mock, and the canvas opens in a browser.
 
 ## Phase 2 — PREVIEW (approval gate)
 

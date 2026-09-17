@@ -6,11 +6,12 @@ Approval questions are **mandatory**: every open decision is rendered as a numbe
 
 Pair with [ui-verify-loop](https://github.com/kimwoct/ui-verify-loop): the fix loop proves the change renders; the verify loop proves it is *right* (matches a user-named reference) and *shipped* (deployed, then re-checked end-to-end) before a round may be called FIXED.
 
-## Repo contents
+## What it ships with
 
 - `SKILL.md` — the skill body (phases, serving instructions, anti-patterns).
-- `ui-fix-canvas/canvas-approval.js` — the approval widget included by every canvas; enforces the mandatory per-question answers and posts the decision.
-- `ui-fix-canvas/server.py` — canvas server (stdlib-only): serves the canvas directory and provides the `/api/decision` API that records `approved` / `changes-requested` + per-question answers to `<canvas>.decision.json`.
+- The canvas tooling lives in the `ui-fix-loop` repo under `ui-fix-canvas/` (installed by the command below; not inside the skills collection):
+  - `ui-fix-canvas/canvas-approval.js` — the approval widget included by every canvas; enforces the mandatory per-question answers and posts the decision.
+  - `ui-fix-canvas/server.py` — canvas server (stdlib-only): serves the canvas directory and provides the `/api/decision` API that records `approved` / `changes-requested` + per-question answers to `<canvas>.decision.json`.
 
 ## Install
 

@@ -1,6 +1,6 @@
 ---
 name: ui-verify-loop
-description: "Closing gate for UI-visible fixes and changes. Runs AFTER a fix is implemented (typically via ui-fix-loop) and proves it against a user-named REFERENCE: ask which reference to cross-check and get approval BEFORE fixing, then live-verify, then DEPLOY to the target environment and run an end-to-end confirmation against the same reference — with evidence on the review canvas — before a round may be called FIXED."
+description: "Closing gate for UI-visible fixes and changes, paired with ui-fix-loop. Use after a UI fix is implemented, when it must be proven against a user-named REFERENCE and confirmed on the deployed environment before the round is called FIXED."
 ---
 
 # UI Verify Loop
@@ -29,7 +29,7 @@ Follow `ui-fix-loop` phases 3+: implement, run the project's checks, capture liv
 1. **Confirm the deployment target with the user** (which env: UAT / prod / school server) and deploy the change there — frontend and backend alike when both moved.
 2. **Re-run the reference cross-check ON the deployed environment**, not localhost: exercise the real user path (upload the artifact, download it back, generate the export, click the flow) and compare the result against the same Phase-0 reference.
 3. Update the canvas with the deployed-environment evidence (what was checked, what came back). Every numbered issue must show deployed-env proof, not localhost proof.
-4. **Traceability closes with the round.** For rounds tied to a Conductor card (a round with no knowable card id skips this — the clean-heading exception), confirm the two-way canvas↔card link on the live/deployed surface before `FIXED`: `GET /requirement-canvas/<cardId>` returns 200 with the `t-<id8> · requirement canvas` chrome (the tailnet board URL authenticates via the tailnet identity; `localhost:8798` needs a session cookie), and the served canvas `<title>`/`<h1>` begin with `[t-<id8>]`. Record both checks (URL + result) in the canvas evidence section. A round whose canvas cannot be opened from the board, or whose canvas does not name its card, is not traceable end-to-end — the same standard as any other verification.
+4. **Traceability closes with the round.** For a round tied to a Conductor card, close the two-way canvas↔card link by ui-fix-loop's **Traceability** check — confirm both directions on the live surface and record the two URLs and their results in the canvas evidence. A round with no knowable card id skips this (the clean-heading exception); a round whose canvas the board cannot open, or that does not name its card, is not traceable end-to-end.
 5. Only when canvas evidence and the deployed environment agree: mark the round `FIXED — deployed & e2e-verified <env> <date>`, deliver screenshots inline, and update memory.
 
 ## Anti-patterns this skill exists to prevent

@@ -46,7 +46,7 @@ mkdir -p ~/.agents/skills
 cp -R skills/code-review skills/tdd ~/.agents/skills/
 ```
 
-Each skill folder is standalone — no cross-skill dependencies.
+Each skill folder is self-contained — no cross-skill dependencies. The one external piece is `ui-fix-loop`'s canvas tooling (`server.py` + `canvas-approval.js`), installed from the [ui-fix-loop repo](https://github.com/kimwoct/ui-fix-loop); see that skill's README.
 
 ## License
 
