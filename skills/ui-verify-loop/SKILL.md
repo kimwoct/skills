@@ -29,7 +29,8 @@ Follow `ui-fix-loop` phases 3+: implement, run the project's checks, capture liv
 1. **Confirm the deployment target with the user** (which env: UAT / prod / school server) and deploy the change there — frontend and backend alike when both moved.
 2. **Re-run the reference cross-check ON the deployed environment**, not localhost: exercise the real user path (upload the artifact, download it back, generate the export, click the flow) and compare the result against the same Phase-0 reference.
 3. Update the canvas with the deployed-environment evidence (what was checked, what came back). Every numbered issue must show deployed-env proof, not localhost proof.
-4. Only when canvas evidence and the deployed environment agree: mark the round `FIXED — deployed & e2e-verified <env> <date>`, deliver screenshots inline, and update memory.
+4. **Traceability closes with the round.** For rounds tied to a Conductor card (a round with no knowable card id skips this — the clean-heading exception), confirm the two-way canvas↔card link on the live/deployed surface before `FIXED`: `GET /requirement-canvas/<cardId>` returns 200 with the `t-<id8> · requirement canvas` chrome (the tailnet board URL authenticates via the tailnet identity; `localhost:8798` needs a session cookie), and the served canvas `<title>`/`<h1>` begin with `[t-<id8>]`. Record both checks (URL + result) in the canvas evidence section. A round whose canvas cannot be opened from the board, or whose canvas does not name its card, is not traceable end-to-end — the same standard as any other verification.
+5. Only when canvas evidence and the deployed environment agree: mark the round `FIXED — deployed & e2e-verified <env> <date>`, deliver screenshots inline, and update memory.
 
 ## Anti-patterns this skill exists to prevent
 
