@@ -5,8 +5,9 @@ skills for AI coding agents (Claude Code, Codex, ZCode, …).
 
 Each skill is a self-contained folder (`skills/<name>/SKILL.md` plus any supporting
 files) that you drop into your agent's skills directory. The companion loop skills
-`ui-fix-loop` and `ui-verify-loop` are included here and also maintained in their own
-repos ([ui-fix-loop](https://github.com/kimwoct/ui-fix-loop),
+`ui-fix-loop`, `ui-logic-loop`, and `ui-verify-loop` are included here; the first and
+last are also maintained in their own repos
+([ui-fix-loop](https://github.com/kimwoct/ui-fix-loop),
 [ui-verify-loop](https://github.com/kimwoct/ui-verify-loop)).
 
 ## Included skills
@@ -27,6 +28,7 @@ repos ([ui-fix-loop](https://github.com/kimwoct/ui-fix-loop),
 | `tdd` | Test-driven development — red-green-refactor and integration testing |
 | `triage` | Move issues and external PRs through a state machine of triage roles |
 | `ui-fix-loop` | Loop-engineering workflow for UI bug fixes: REVIEW → PREVIEW (approval gate) → IMPLEMENT → VERIFY on one HTML canvas |
+| `ui-logic-loop` | Loop-engineering workflow for logic-visible changes (data flow, API orchestration, caching, jobs): an archify sequence-diagram pair — CURRENT → PREVIEW (approval gate) → IMPLEMENT → VERIFY on the deployed flow |
 | `ui-verify-loop` | Closing gate after a UI fix: proves the change matches a named REFERENCE and is deployed + e2e-verified |
 | `vercel-react-best-practices` | React and Next.js performance optimization guidelines from Vercel Engineering |
 | `writing-great-skills` | Reference for writing and editing skills well |
@@ -46,7 +48,7 @@ mkdir -p ~/.agents/skills
 cp -R skills/code-review skills/tdd ~/.agents/skills/
 ```
 
-Each skill folder is self-contained — no cross-skill dependencies. The one external piece is `ui-fix-loop`'s canvas tooling (`server.py` + `canvas-approval.js`), installed from the [ui-fix-loop repo](https://github.com/kimwoct/ui-fix-loop); see that skill's README.
+Each skill folder is self-contained — no cross-skill dependencies. The external pieces are `ui-fix-loop`'s canvas tooling (`server.py` + `canvas-approval.js`), installed from the [ui-fix-loop repo](https://github.com/kimwoct/ui-fix-loop), and the `archify` diagram skill (plus its Node CLI) that `ui-logic-loop` delegates its diagrams to; see each skill's README.
 
 ## License
 
