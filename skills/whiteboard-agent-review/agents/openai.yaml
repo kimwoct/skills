@@ -1,0 +1,3 @@
+interface:
+  display_name: "Whiteboard Agent Review"
+  short_description: "Audit one agent's implementation in Whiteboard"
