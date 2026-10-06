@@ -1,6 +1,6 @@
 ---
 name: ui-verify-loop
-description: "Closing gate for UI-visible fixes and changes, paired with ui-fix-loop. Use after a UI fix is implemented, when it must be proven against a user-named REFERENCE and confirmed on the deployed environment before the round is called FIXED."
+description: "Closing gate for UI-visible fixes and changes, paired with ui-fix-loop. Use after a UI fix is implemented, when it must be proven against a user-named REFERENCE and confirmed on the deployed environment before the round is called FIXED. Also runs when the evidence canvas is a Whiteboard board — e.g. one produced by a similar prompt like \"produce the architecture-sketch Whiteboard (data flows, access patterns, code paths) and open it\" (whiteboard-agent-review Mode B)."
 ---
 
 # UI Verify Loop
@@ -32,9 +32,22 @@ Follow `ui-fix-loop` phases 3+: implement, run the project's checks, capture liv
 4. **Traceability closes with the round.** For a round tied to a Conductor card, close the two-way canvas↔card link by ui-fix-loop's **Traceability** check — confirm both directions on the live surface and record the two URLs and their results in the canvas evidence. A round with no knowable card id skips this (the clean-heading exception); a round whose canvas the board cannot open, or that does not name its card, is not traceable end-to-end.
 5. Only when canvas evidence and the deployed environment agree: mark the round `FIXED — deployed & e2e-verified <env> <date>`, deliver screenshots inline, and update memory.
 
+## Whiteboard-hosted rounds
+
+When the evidence canvas is a Whiteboard board — typically produced by a similar prompt like **"produce the architecture-sketch Whiteboard (data flows, access patterns, code paths) and open it"** (whiteboard-agent-review Mode B) — run the same phases with these translations:
+
+- **Canvas = a Whiteboard session.** Record the board's pins (`worktree`/`commits`, base, head) as Phase-0 provenance: they name the revision every `review-source:` link on the board resolves against.
+- **Phase 0 unchanged in substance.** The user must still name the reference, and approval stays explicit and numbered with required answers. For sketch-hosted rounds the realistic reference candidates are: a named environment's live behavior (strongest), the deployed branch the environment actually runs (e.g. up-to-date `develop`), or the board itself for pure-render rounds only. A sketch that cites code is **not** its own reference.
+- **Cross-check = per-claim verification.** Re-resolve every code link at the pinned revision (`session_source` / `session_file` / `session_diff`) and re-exercise the flows the board asserts against the reference environment; write a per-claim `Verification` section on the board (claim → observed → agrees/differs), never a batch verdict.
+- **Phase 1: fix the board, not the repo.** If the sketch drifted from reality, update the board under a fresh document lease (repin → read → edit). Only if the *reference itself* (env/artifact) turns out wrong or drifted is this a repo fix — and that becomes a new ui-fix-loop round with its own canvas.
+- **Phase 2 unchanged.** Deployed-environment proof still means exercising the real user path on the named env; traceability URLs are recorded as board evidence. The closing label for a verification board is `VERIFIED — deployed & e2e-verified <env> <date>` (`FIXED` stays reserved for fix rounds). End the lease (`session_activity_end`) before `session_open` so the board reads as ready.
+- **Evidence record.** Persist the whiteboard-agent-review JSON format with `agent: null` and `verification` entries pointing at the board's Verification section.
+- **Authoring details, schemas, recovery.** See skill: whiteboard-agent-review (§Schema notes learned on a live v0.2 run; Mode B authoring contract; instance-switch recovery).
+
 ## Anti-patterns this skill exists to prevent
 
 - Declaring victory on localhost while the deployed env still runs the old build/template/backend list.
 - "Verifying" by re-reading code or API status codes instead of exercising the real artifact path end-to-end.
 - Fixing toward an assumed reference; the user's named artifact is the only oracle, and drift between stored and reference state must be *reported*, never silently normalized.
 - Skipping the reference/approval ask because the fix seems obvious — that ask is the whole point.
+- Treating a Whiteboard sketch's code citations as verification: citing code is provenance, not proof; sketch-hosted rounds still owe deployed-environment evidence before any `VERIFIED` label.
