@@ -52,6 +52,21 @@ gate (`awaiting_decision`) — that needs a human `conductor edit`/dashboard
 decision, not a retry loop. See docs/quota-fallback-spec.md (decisions ①–⑬)
 and ADR 0003 in the backlog repo.
 
+### Retry and crash recovery
+
+Before retrying a partially completed attempt, reconcile the recorded run with
+read-only evidence of what actually happened, using the supported CLI. Retry the
+same run; a retry creates another attempt, not a duplicate task specification or
+run. Check whether a prior side effect completed before replaying it, and reuse
+its stable operation identity when the runtime supports deduplication. Do not
+blindly repeat a non-idempotent external effect or bypass an operator gate.
+
+When implementing or testing recovery, use isolated fixtures to run an operation
+twice and interrupt it between meaningful state transitions. Re-execution must
+converge to the intended state without lost work or duplicate effects. Reconcile
+partial state through supported transitions; never hand-edit board state to make
+an attempt look complete.
+
 ## 4. Work a card like a ticket (TDD)
 
 For implementation cards: write the failing test first, implement to green,
@@ -77,3 +92,8 @@ approve via dashboard or decide via CLI; do not auto-approve.
 - E2E checks on the live board: prefer a tiny `[plan]`/`[cheap]` probe card
   over mutating real cards; restore any temporary config (e.g.
   `quota.exhausted_pct`) immediately after.
+
+The added retry/crash recovery guidance is adapted from pstack
+`principle-make-operations-idempotent`,
+commit `d0ef80d86795816da932a153458c5dbe192d294e`. Copyright (c) 2026 Lauren Tan;
+see [pstack attribution and license](references/pstack-LICENSE.txt).
