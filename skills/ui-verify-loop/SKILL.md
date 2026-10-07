@@ -9,6 +9,14 @@ The companion to `ui-fix-loop`. The fix loop proves the change renders; the veri
 
 **Tradeoff:** for trivial one-line changes with no layout or logic impact, keep this lightweight and use judgment.
 
+## Coding-agent selection and Herdr sessions (global)
+
+Apply `ui-fix-loop`'s **Coding-agent selection and Herdr sessions (global)** contract to coding work in every repository, including Whiteboard-hosted rounds:
+
+- Offer installed coding agents before dispatch, default a new decision to **Pi**, and retain the user's saved explicit choice. Reuse the fix/logic round's approved decision; verification does not independently dispatch a duplicate coding run. For a Whiteboard-only round, record the choice with its numbered approval answers.
+- Each dispatched coding run uses its own uniquely named persistent **Herdr terminal session**, not a pane in a shared session. Continue verification in the existing run/session where applicable; a new coding retry run gets a new session and remains subject to the approval contract. Missing agent or repository configuration is a blocker, never permission to substitute an agent silently.
+- Include selected/assigned agent, dispatch state, run ID, and session ID in the evidence when a coding run exists. Confirm the actual session/process before reporting running. Preserve reference approval, deployment confirmation, and deployed end-to-end proof: updating these instructions alone is not a deployed runtime fix.
+
 ## Phase 0 — REFERENCE (before any fix is applied)
 
 A fix without a reference is guessing. Before touching code:
@@ -24,7 +32,11 @@ A fix without a reference is guessing. Before touching code:
 
 Follow `ui-fix-loop` phases 3+: implement, run the project's checks, capture live-page evidence for every issue, update the canvas, loop until canvas and live page agree.
 
-## Phase 2 — DEPLOY + E2E CONFIRMATION (the closing gate)
+Finish Phase 1 by opening a PR from the round's worktree branch into its parent branch (`develop` by default — ui-fix-loop **Worktree and PR**). Mark the round `IMPLEMENTED — PR <url> → <parent>` and stop there. Never ask about deployment before or during implementation.
+
+## Phase 2 — DEPLOY + E2E CONFIRMATION (later, after merge)
+
+Run this phase only after the PR is merged **and** the user asks to deploy. It is never part of the pre-implementation approval questions.
 
 1. **Confirm the deployment target with the user** (which env: UAT / prod / school server) and deploy the change there — frontend and backend alike when both moved.
 2. **Re-run the reference cross-check ON the deployed environment**, not localhost: exercise the real user path (upload the artifact, download it back, generate the export, click the flow) and compare the result against the same Phase-0 reference.

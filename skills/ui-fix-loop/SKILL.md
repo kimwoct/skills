@@ -9,12 +9,34 @@ A standing workflow for UI bug fixes, usable in any project. One HTML canvas acc
 
 **Tradeoff:** for trivial one-line changes with no layout or logic impact, keep this lightweight and use judgment — the loop is mandatory for anything where pixels or interaction change.
 
+## Coding-agent selection and Herdr sessions (global)
+
+This contract applies to every repository using this skill, `ui-logic-loop`, or `ui-verify-loop`; it is not limited to a named project.
+
+- **Selection before dispatch.** Every canvas approval panel must offer the installed coding agents, with **Pi selected by default for a new decision**. Preserve a saved explicit selection. For a diagram-only or Whiteboard-hosted round, record the same choice with its approval answers instead of requiring an HTML panel.
+- **Honor the choice.** Persist the selected agent in the decision record and pass it to the implementation dispatcher. An explicit user choice takes precedence over executor triage. If Pi or the chosen agent is unavailable, or the repository is not configured, report the blocker and ask for an explicit alternative; never silently substitute an agent.
+- **One run, one Herdr session.** Every dispatched coding-agent run must execute in its own uniquely named persistent Herdr terminal session, in the target repository's working directory. Separate panes in one shared session do not satisfy isolation. A retry that creates a new run gets a new session; monitoring or resuming the same run reuses its session. Preserve active-run deduplication so repeated approval does not launch duplicate agents.
+- **Approval still gates execution.** Selection alone does not launch an agent. Start implementation only after all required numbered answers and the reference/preview approval are present. Do not start coding agents during preview checks.
+- **Status and evidence.** Show dispatch state, selected/assigned agent, run ID, and Herdr session ID alongside the saved timestamp and decision-event status. Record the run/session mapping on the canvas or diagram evidence so the terminal can be inspected. A queued decision or emitted event is not proof that an agent started; confirm the actual session and process before claiming it is running.
+- **Verify the shared path.** When changing this behavior, test Pi default, saved selection, selected-agent payload, unavailable-agent/configuration errors, approval gating, duplicate approvals, and distinct Herdr sessions for distinct runs. Recheck the same path on the confirmed deployment target before calling the runtime fixed.
+- **Instructions are not runtime deployment.** If the shared widget/dispatcher lacks these capabilities, report that gap; editing these skills does not implement it. Keep runtime changes and deployment within the user's separately authorized scope.
+
+## Worktree and PR (global default)
+
+Every approved implementation runs in a **new git worktree** on a new branch cut from the up-to-date **parent branch** (`develop` unless the user names another), and the round ends by **opening a PR into that parent branch**. This is the recommendation; do not ask the user to confirm it.
+
+- Never implement in the main checkout or in a checkout the dispatcher happens to point at. If the current branch lacks the code to change, recut the worktree from the parent branch rather than merging another branch into it.
+- Approval questions cover **implementation only**: the intended end result, the reference, and genuine scope choices. Do **not** ask about the deployment target, environment, or release timing. Deployment is a separate, later step that starts only after the PR is merged and the user asks for it.
+- If the parent branch itself is genuinely ambiguous (e.g. the fix must land on a release branch), state the recommended parent as the default in a single numbered question; otherwise do not ask about it.
+- Record the worktree path, branch, parent branch, and PR URL on the canvas evidence.
+
 ## The canvas
 
 - Path: `~/.agents/ui-fix-canvas/<repo>/<issue-slug>.html` — outside every repo, so scratch files are never committed and no per-project setup is needed. The `<repo>` segment must be a lowercase-hyphen slug (`ai-leave-management-frontend`, never the GitHub-cased name) and, when the canvas should dispatch work, a key in the dispatch-watcher's `REPOS` map; root-level pages (`/<slug>.html`) are rejected too. A non-conforming segment makes every Approve POST 404 "unknown canvas" with no other symptom.
 - ONE file per issue, updated in place through the phases. Never fork it into per-phase copies.
 - Plain hand-written HTML/CSS replicating the relevant UI region — no framework, no build step.
 - Every canvas includes the approval widget: add `<script src="/canvas-approval.js"></script>` before `</body>`. It renders a floating panel with a **required answer box per open question**, a comment input, and Approve / Request-changes buttons that POST to the server's decision API. The gate keys off the questions declared as `approval-answer` fields (Phase 2) — a canvas with the script but no such fields has a widget with nothing to gate.
+- **Decision hooks.** Once a decision is saved, the widget dispatches a `ui-fix-loop:decision` CustomEvent on `document` (detail: `{canvas, status, comment, answers, record}`) and calls `window.uiFixLoopApprovalCallback(record)` if defined — a canvas page can listen for either to chain behavior after `approved` (the callback must be set before the widget script loads). A non-2xx POST renders "save failed — is server.py running?" instead of a false success, and an exception thrown by the callback is logged after the fact without un-saving the decision.
 - **The heading carries the board task no.** When the work has a Conductor card — a canvas dispatch, or any request that can be tied to a card — begin both `<h1>` and `<title>` with `[t-<id8>]` (e.g. `<h1>[t-3ecb9f12] 前後測活動報告 …</h1>`), taken from the card's `display_id`. The raw `:8791` URL has no board chrome, so the heading is the only place the id can appear. When no card id is knowable, leave the heading clean rather than guessing — a wrong prefix is worse than none.
 - **Traceability is two-way and is part of the deliverable:**
   - canvas → card: the `[t-<id8>]` heading above. A canvas opened from its bare tailnet URL is anonymous without it.
@@ -44,13 +66,23 @@ Before reading implementation code in depth, build the canvas in its REVIEW stat
 
 Update the same file to show the **intended end result** (the same region as it should render after the fix), keeping the issue list with each item marked "pending fix".
 
-**Mandatory question answers — silence never approves.** Every open decision (template vs alternative, keep/drop a category, code numbers, deploy scope …) must be rendered on the canvas as a numbered question with its own required textbox:
+**Mandatory question answers — silence never approves.** Every open decision (template vs alternative, keep/drop a category, code numbers … — never deployment target or timing; see **Worktree and PR**) must be rendered on the canvas as a numbered question with its own required textbox:
 
 `<textarea class="approval-answer" data-question="① <short question>" placeholder="recommended: … (type OK, or your answer)"></textarea>`
 
 The widget moves these into its panel and keeps Approve / Request-changes **disabled until every box is filled** — typing `OK` on a recommended default is fine, but it must be typed. The answers are stored in the decision record (`answers` + composed `comment`). A chat reply approves only if it answers **every** numbered question in so many words; a bare "approved" / "looks good", or silence on any point, is NOT consent to a recommended default — re-ask, listing the unanswered numbers, and wait again.
 
 Present the canvas to the user and state the intended end result in one or two sentences. **Wait for the user's approval before touching real code** — given either as a chat reply that answers every question, or via the canvas approval widget (check the decision API: only `approved` with all answers present opens the gate; `changes-requested` means fold the comment into the preview and re-present). A wrong preview is the cheapest possible failure — this gate exists because fixes built on wrong assumptions (verified symptom area only, adjacent behavior unbroken-checked) ship regressions.
+
+## Executor triage (optional — typesafe_evaluate)
+
+When Phase 3 is about to start, more than one executor is available, and TypeSafe is enabled for the session (`/typesafe enable` once, or `PI_TYPESAFE_ENABLED=1` + `TYPESAFE_API_KEY` headless), spend **ONE** batched call to pick the dispatch target before implementing:
+
+- **state**: the fix task in one sentence, plus one factual field per candidate agent — harness, model, browser tooling (can it drive the live-page evidence steps?), and its track record in this repo. Name the fields; the questions reference them.
+- **questions**: one **score** question per agent — "How able is `candidates.<id>` to complete this task end to end?" on a 4-level rubric phrased as situations, not degrees (0 *unlikely: cannot drive the browser-verified loop unaided* / 1 *partial: lands the code but struggles with live-page evidence* / 2 *capable: completes fix + verification, maybe with a retry* / 3 *strong: end-to-end with evidence, minimal supervision*) — plus one **choice** question for dispatch order. One judgment per question; batch everything into the single request.
+- **recommend** the highest score (break ties with the choice answer), and record the scores with their probabilities next to the canvas issue list or as a card event. Dispatch the approved agent under the global selection contract above; triage never silently overrides a user selection or the Pi default.
+
+Guardrails: triage is an optimization, never a gate — if the tool is disabled, unkeyed, or returns a `budget` error, skip triage silently and retain the approved agent (Pi by default). Confidence is distribution concentration, not proof or authorization; report it alongside the choice, never act on it alone. Do not spend a second request re-triaging after a decline — the loop's own verify phase is the correction mechanism.
 
 ## Phase 3 — IMPLEMENT, then VERIFY (the loop)
 
