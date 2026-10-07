@@ -37,6 +37,7 @@ last are also maintained in their own repos
 | `ui-logic-loop` | Loop-engineering workflow for logic-visible changes (data flow, API orchestration, caching, jobs): an archify sequence-diagram pair — CURRENT → PREVIEW (approval gate) → IMPLEMENT → VERIFY on the deployed flow |
 | `ui-verify-loop` | Closing gate after a UI fix: proves the change matches a named REFERENCE and is deployed + e2e-verified; also runs Whiteboard-hosted verification rounds (whiteboard-agent-review Mode B) |
 | `vercel-react-best-practices` | React and Next.js performance optimization guidelines from Vercel Engineering |
+| `whiteboard-agent-review` | Review one implementation agent's work with agent/run metadata and an explicit diff (Mode A), or author an architecture-sketch Whiteboard of the repo's data flows and code paths (Mode B) |
 | `writing-great-skills` | Reference for writing and editing skills well |
 
 ## Install
