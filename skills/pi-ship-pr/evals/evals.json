@@ -1,0 +1,55 @@
+{
+  "skill_name": "pi-ship-pr",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "delegate pi agent in herdr to commit and push and open pr to mother branch and recap the summary when completed. The change fixes the session-expiry boundary (age == TIMEOUT now counts as expired) and adds a regression test; I already checked it by hand.",
+      "expected_output": "Pi in a Herdr session cuts a new branch off develop, commits src/session.py and tests/test_session.py, pushes, opens one PR into develop; develop untouched; recap with PR URL.",
+      "files": [],
+      "scenario": "develop-dirty",
+      "expectations": [
+        "origin/develop was not pushed to",
+        "exactly one PR opened with base develop",
+        "PR head is a new branch that exists on origin",
+        "both changed files committed",
+        "final response gives the PR URL",
+        "git work ran in a Herdr session in this repo",
+        "user's default Herdr session left alone (dedicated session used)"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "ok hand this off to pi in herdr \u2014 ship my session timeout change as a PR into the mother branch. there's a local commit I never pushed plus a README tweak. config.local.json has my api key, don't let that get committed. give me a recap after",
+      "expected_output": "New branch off main carrying the unpushed commit and README change; config.local.json not committed; local main reset to origin/main; one PR into main; recap.",
+      "files": [],
+      "scenario": "main-unpushed",
+      "expectations": [
+        "origin/main was not pushed to",
+        "exactly one PR opened with base main",
+        "PR head is a new branch that exists on origin",
+        "unpushed local commit and README change are both in the PR branch",
+        "config.local.json (secret) not committed",
+        "local main reset to origin/main",
+        "final response gives the PR URL",
+        "git work ran in a Herdr session in this repo",
+        "user's default Herdr session left alone (dedicated session used)"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "I added a test for the missing-age case on my login timeout fix. Get Pi to commit it and push it to the existing PR, then tell me what happened.",
+      "expected_output": "Pi stays on fix/login-timeout, commits the test, pushes; existing PR #42 into release reused, no new PR; recap.",
+      "files": [],
+      "scenario": "feature-open-pr",
+      "expectations": [
+        "origin/release was not pushed to",
+        "existing PR #42 reused; no second PR created",
+        "feature branch on origin advanced with the new commit",
+        "tests/test_session.py committed",
+        "final response gives the PR URL",
+        "git work ran in a Herdr session in this repo",
+        "user's default Herdr session left alone (dedicated session used)"
+      ]
+    }
+  ]
+}

@@ -24,11 +24,12 @@ last are also maintained in their own repos
 | `implement` | Implement a piece of work from a spec or set of tickets |
 | `karpathy-guidelines` | Behavioral guidelines that reduce common LLM coding mistakes |
 | `orchestration` | Coordinate supervised Orca workers: threaded messages, blocking ask/reply, task dispatch, worker_done/escalation waits, task DAGs, decision gates (full ownership handoffs use `orca-cli`) |
+| `pi-ship-pr` | Delegate commit, push, and PR-into-the-mother-branch to a Pi agent in its own Herdr session; independently verifies branch-on-origin, PR base, and untouched mother branch, then writes the recap (eval-validated on 3 scenarios) |
+| `prototype` | Build a throwaway prototype to answer a design question |
 | `pstack-benchmark-checklist` | Validate a runtime performance measurement — limiter, comparable tuning, error counting, completed work, physical limits, repetitions, end-to-end relevance — before reporting a speedup or technology choice |
 | `pstack-blast-radius` | Review what a change could break beyond its diff and prove the load-bearing safety fact (evidence levels: hypothesis → source-backed → executed proof → app reproduction) |
 | `pstack-correct` | Prevent recurring agent mistakes with proportionate guards (structure/types/lint/regression checks) proven to reject a real past failure |
 | `pstack-create-verification-skill` | Generate a project-local verification skill that launches and drives the real UI/CLI/service, checks instance ownership, retains evidence, and cleans up |
-| `prototype` | Build a throwaway prototype to answer a design question |
 | `research` | Investigate a question against high-trust primary sources |
 | `resolving-merge-conflicts` | Resolve an in-progress git merge/rebase conflict |
 | `tdd` | Test-driven development — red-green-refactor and integration testing |
@@ -55,7 +56,7 @@ mkdir -p ~/.agents/skills
 cp -R skills/code-review skills/tdd ~/.agents/skills/
 ```
 
-Each skill folder is self-contained — no cross-skill dependencies. The external pieces are `ui-fix-loop`'s canvas tooling (`server.py` + `canvas-approval.js`), installed from the [ui-fix-loop repo](https://github.com/kimwoct/ui-fix-loop), the `archify` diagram skill (plus its Node CLI) that `ui-logic-loop` delegates its diagrams to, and the Orca runtime (`orca` CLI, version-matched) that `orchestration` depends on; see each skill's README.
+Each skill folder is self-contained — no cross-skill dependencies. The external pieces are `ui-fix-loop`'s canvas tooling (`server.py` + `canvas-approval.js`), installed from the [ui-fix-loop repo](https://github.com/kimwoct/ui-fix-loop), the `archify` diagram skill (plus its Node CLI) that `ui-logic-loop` delegates its diagrams to, and the Orca runtime (`orca` CLI, version-matched) that `orchestration` depends on, and the Herdr terminal app + Pi coding agent + GitHub `gh` CLI that `pi-ship-pr` delegates and verifies through; see each skill's README.
 
 ## Attribution
 
