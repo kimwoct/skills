@@ -50,6 +50,7 @@ last are also maintained in their own repos
 | `setup-matt-pocock-skills` | Configure a repo for the engineering skills: issue tracker, triage labels, and domain-doc layout; run once before first use |
 | `setup-pre-commit` | Set up Husky pre-commit hooks with lint-staged (Prettier), type checking, and tests |
 | `setup-ts-deep-modules` | Wire dependency-cruiser into a TypeScript repo so each package is a deep module behind a small entry-point API |
+| `skills-kimwoct-patterns` | Collection-specific conventions measured from this repo's git history: skill folder layout, frontmatter == directory, README-row co-change, pre-push validation gates |
 | `tdd` | Test-driven development — red-green-refactor and integration testing |
 | `teach` | Teach the user a new skill or concept within this workspace |
 | `to-questionnaire` | Turn a decision you can't fully answer into a questionnaire for someone else to fill in |
