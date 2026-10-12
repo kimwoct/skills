@@ -139,14 +139,14 @@ This mode authors a sketch of the repository itself. It is **not** an agent-run 
 
 ### Required inputs
 
-- `repository_path`: absolute local Git/jj checkout path. Stop and ask only for this.
+- `repository_path`: absolute local Git/jj checkout path. Infer it from the current checkout when unambiguous; ask only if the repository cannot be identified.
 - Optional: a commit range to pin; otherwise pin the checkout as a `worktree` target with no `base` (reviews the checkout against the default branch).
 
 ### Workflow
 
 1. **Provenance-light.** Confirm the checkout and record the pins (`git rev-parse --show-toplevel`, branch, clean/dirty state) and the timestamp. A dirty worktree may include uncommitted work by design — note what is included.
-2. **Register and create.** `session_register_repository {path}`, then `session_create {title: "Architecture sketch — <repo>", target: {kind: "worktree", repositoryId, base?}, open: false}`. Call `session_get_instructions` for the authoring flow, and `session_get_instructions({topic: "file-lenses"})` when authoring lenses; follow their ordering rules (register → create → lease → read diff → write immediately).
-3. **Read the repo before writing.** Trace real entry points (app routes/actions, background jobs, API controllers) with `session_tree`, `session_file`, and `session_source`, plus the repo's own navigation aids (AGENTS.md, graphify-out/wiki, ARCHITECTURE docs) before any claim reaches the canvas. Every `review-source:` link must cite a verified line number.
+2. **Discover and create.** Read `session_get_instructions` and `session_capabilities` before authoring. Discover the installed schemas with `whiteboard api tools <tool-name>`; use the CLI when MCP only exposes instruction tools. Current versions accept `target: {kind: "worktree", repositoryPath, base?}`; register separately only when required by the installed schema. Do not put repositoryPath at the top level for an ordinary worktree target. Follow the authoring order: create, lease, inspect diff, write the scope immediately. Use the Desktop-connected instance when the user asks to open the result; isolated headless state is not the default for Mode B. Generate software maps only when capabilities enable them.
+3. **Read the repo before writing.** Trace real entry points (app routes/actions, background jobs, API controllers) using the source tools actually available, or local line-numbered source reads. Consult applicable AGENTS.md and architecture docs; use CodeGraph first when the checkout is indexed. Do not assume older `session_tree`, `session_file`, `session_source`, or `session_diff` tools exist. Every `review-source:` link must cite a verified line number.
 4. **Author the sketch, one section per edit** under a `session_activity_begin` document lease (each accepted write or update extends the 3-minute window):
    - *what/why* — one paragraph: system boundaries, transport, principal actors;
    - *main data flows* — `sequence` lenses (client → server API/actions → controllers → stores), one per principal flow;
@@ -154,15 +154,29 @@ This mode authors a sketch of the repository itself. It is **not** an agent-run 
    - *code paths* — `call_stack_diff` (or `flow_diagram` for branchy flows) rooted at user/agent entry points;
    - *review hooks* — hot spots, god nodes, risky seams, and an open-questions list where the architecture reviewer should start. Mode A's Findings/Decision sections do **not** apply here; do not paste audit verdicts onto a sketch.
    - Link code as `[label](review-source:head/path#L10-L24)` with repository-relative paths and verified numbers; prefer `code_peek` for the few mechanism-carrying ranges.
-5. **Read back and open.** `session_get` the whole canvas, fix contradictions and unverified claims, `session_activity_end` the lease, then `session_open {sessionId}` — the trigger contract is that the board is open at the end.
+5. **Read back and open.** `session_get {sessionId, full: true}` the whole canvas, fix contradictions and unverified claims, `session_activity_end` the lease, then `session_open {sessionId}` — the trigger contract is that the board is open at the end. Confirm the returned opened status; if Desktop is unavailable, report that limitation rather than claiming it opened.
 6. **Report.** Give the `sessionId`, what each lens should be used for during the review, and which repo areas were left unsketched.
 7. **Evidence (optional).** The Mode A JSON evidence record is not required here. Write one only on request, with `agent: null` and the same no-guessing rule.
 
 ### Mode B gates
 
+- A clean diff is valid for a current-state architecture sketch. Do not change the target or stage files merely to fabricate changes. Diff-view lenses can be empty; document diagrams describe the current architecture.
+- Apply Mode A's task, agent, and verdict gates only to Mode A. Mode B is repository-bound and must not request invented run metadata or a merge decision.
 - Sketch what **is**: every architecture claim carries code evidence (verified line ranges). No code link, no claim.
 - Do not convert the sketch into a findings report or a merge/deploy verdict; the review hooks section is the handoff to the human reviewer.
 - Editing an existing sketch: repin it, read the existing document and the diff since it was authored (per the authoring instructions' "updating existing whiteboard" flow) before updating.
+
+### System-design drilling prompt
+
+Use Mode B for prompts such as:
+
+> Use $whiteboard-agent-review to review this repository's system design. Create a Whiteboard showing the main data flows, access patterns, and code paths so I can do a full architecture review. Drill into trust boundaries, data ownership, consistency, failure recovery, and scaling constraints with source-linked questions. Open it in Whiteboard when done.
+
+Treat drilling as an evidence-backed review guide, not permission to redesign or modify application code. Start with the system boundary and actors, then follow each principal user action or background trigger through authorization, reads, writes, external calls, and response or completion. For each flow, identify the state owner, lookup keys, commit point, synchronization mechanism, and failure/retry behavior that the source actually implements.
+
+Use sequence diagrams for interactions, a database lens for logical stores and access patterns (label JSON/files accurately rather than implying SQL), and call stacks or flow diagrams for executable paths. Keep sibling calls as siblings; mark HTTP, queue and callback boundaries explicitly. Never invent an old implementation for a current-state call stack.
+
+Finish with source-linked review questions about the relevant seams: concurrent writers, idempotency, partial failure, restart recovery, permission boundaries, privacy projections, backup/restore coverage, throughput, or observability. Distinguish observed source behavior, runtime evidence, reviewer inference, and proposed alternatives. Do not claim tests or production behavior were verified unless they were. Include coverage limits and unanswered questions. A static sketch does not require starting services, importing data, contacting external dependencies, or deployment.
 
 ## Hard gates
 

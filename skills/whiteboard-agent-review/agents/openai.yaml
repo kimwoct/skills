@@ -1,3 +1,4 @@
 interface:
   display_name: "Whiteboard Agent Review"
-  short_description: "Audit one agent's implementation in Whiteboard"
+  short_description: "Review agent work or drill into repository architecture"
+  default_prompt: "Use $whiteboard-agent-review to sketch this repository's data flows, access patterns, and code paths, add source-linked system-design drilling questions, and open the result in Whiteboard."

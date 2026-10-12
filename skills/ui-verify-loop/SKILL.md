@@ -32,7 +32,7 @@ A fix without a reference is guessing. Before touching code:
 
 Follow `ui-fix-loop` phases 3+: implement, run the project's checks, capture live-page evidence for every issue, update the canvas, loop until canvas and live page agree.
 
-Finish Phase 1 by opening a PR from the round's worktree branch into its parent branch (`develop` by default — ui-fix-loop **Worktree and PR**). Mark the round `IMPLEMENTED — PR <url> → <parent>` and stop there. Never ask about deployment before or during implementation.
+Finish Phase 1 by opening a PR from the round's worktree branch into its confirmed parent branch (ui-fix-loop **Worktree and PR**, including its GitHub parent-branch guard). Use an explicit `--base <parent>` and verify the resulting `baseRefName` and `headRefName` with `gh pr view <url> --json baseRefName,headRefName,url` before marking the round `IMPLEMENTED — PR <url> → <parent>` and stopping there. Never ask about deployment before or during implementation.
 
 ## Phase 2 — DEPLOY + E2E CONFIRMATION (later, after merge)
 
