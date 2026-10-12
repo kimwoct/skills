@@ -28,6 +28,7 @@ last are also maintained in their own repos
 | `grill-with-docs` | Relentless interview to sharpen a plan or design, writing ADRs and glossary as you go |
 | `grilling` | Grill the user relentlessly about a plan, decision, or idea to stress-test their thinking |
 | `handoff` | Compact the current conversation into a handoff document for another agent |
+| `herdr` | Control Herdr, a terminal multiplexer for coding agents — panes, tabs, workspaces, agent prompts — only when explicitly asked and only from inside a Herdr session (`HERDR_ENV=1`) |
 | `implement` | Implement a piece of work from a spec or set of tickets |
 | `implement-spec` | Implement the result of `/to-spec` and `/to-tickets` in code |
 | `improve-codebase-architecture` | Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through the one you pick |
