@@ -97,6 +97,17 @@ The `pstack-*` skills are adapted imports from [cursor/plugins](https://github.c
 
 The engineering skills (`ask-matt`, `chief-of-staff`, `claude-handoff`, `code-review`, `codebase-design`, `domain-modeling`, `grill-*`, `grilling`, `implement`, `implement-spec`, `improve-codebase-architecture`, `loop-me`, `pr`, `prototype`, `research`, `retro`, `scaffold-exercises`, `setup-*`, `teach`, `to-*`, `triage`, `tdd`, `wayfinder`, `writing-*`, …) come from the Matt Pocock skills collection, installed and refreshed via the `setup-matt-pocock-skills` skill; several carry their own in-file credits (for example `pr`, credited to Humanlayer's `show-me` by Dex Horthy). `monid` is a vendor skill that self-updates from [monid.ai](https://monid.ai/SKILL.md); it has no local license file and its API runs are billable.
 
+## Scheduled daily sync
+
+A macOS LaunchAgent syncs the live skills directory into this collection every day at 05:00 and pushes to `main` — the same loop run by hand across recent sessions (fetch → mirror recent changes → structural gates → `pi --print` review pass → gates again → push).
+
+- Script: [`scripts/daily-skill-sync.sh`](scripts/daily-skill-sync.sh) — never force-pushes; on divergence it leaves commits local and exits nonzero instead of overwriting.
+- Schedule: [`scripts/com.kimwoct.skill-sync.plist`](scripts/com.kimwoct.skill-sync.plist) (LaunchAgent, daily 05:00; missed runs fire on wake).
+- Scope: repo-managed skills (updates) plus skills modified within the last 7 days (`SYNC_WINDOW_DAYS`); `*workspace*` artifact dirs and anything without `SKILL.md` stay out.
+- Install on a new machine: `cp scripts/com.kimwoct.skill-sync.plist ~/Library/LaunchAgents/ && launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.kimwoct.skill-sync.plist`
+- Test without side effects: `scripts/daily-skill-sync.sh -n` (mirrors, gates, then restores the tree).
+- Logs: `~/.local/state/skills-kimwoct/skill-sync.log` (plus `launchd.out`/`launchd.err`); requires `pi` on `PATH` (review pass) and push access to `origin/main`.
+
 ## License
 
 MIT
