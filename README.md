@@ -32,6 +32,7 @@ last are also maintained in their own repos
 | `implement` | Implement a piece of work from a spec or set of tickets |
 | `implement-spec` | Implement the result of `/to-spec` and `/to-tickets` in code |
 | `improve-codebase-architecture` | Scan a codebase for deepening opportunities, present them as a visual HTML report, then grill through the one you pick |
+| `jev-ultrafast` | Run Jev, the indexed-element web agent on Browser Harness, for click/type/select/scroll browser actions and download-verification loops under a TypeSafe-driven policy |
 | `karpathy-guidelines` | Behavioral guidelines that reduce common LLM coding mistakes |
 | `loop-me` | Grill you about specs for workflows you want to build, within the workspace |
 | `migrate-to-shoehorn` | Migrate test files from `as` type assertions to @total-typescript/shoehorn |
